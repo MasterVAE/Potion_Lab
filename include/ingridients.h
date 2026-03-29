@@ -1,0 +1,38 @@
+#ifndef INGRIDIENTS_H
+#define INGRIDIENTS_H
+
+#include <stdlib.h>
+
+enum Attribute
+{
+    ATTRIBUTE_WATER,
+    ATTRIBUTE_FORCE,
+    ATTRIBUTE_LIFE,
+    ATTRIBUTE_PAIN,
+    ATTRIBUTE_HEAT,
+    ATTRIBUTE_COLD,
+    ATTRIBUTE_CALMNESS,
+    ATTRIBUTES_COUNT
+};
+
+struct Ingridient
+{
+    char name[100];
+
+    size_t attributes_count;
+    Attribute attributes[10];
+};
+
+static const Ingridient INGRIDIENTS[]
+{
+    {"water", 5, {ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER}},
+    {"glowcap mushroom", 4, {ATTRIBUTE_PAIN, ATTRIBUTE_PAIN, ATTRIBUTE_COLD, ATTRIBUTE_CALMNESS}},
+    {"whichmint", 4, {ATTRIBUTE_CALMNESS, ATTRIBUTE_CALMNESS, ATTRIBUTE_COLD}},
+    {"sunspice", 5, {ATTRIBUTE_HEAT, ATTRIBUTE_HEAT, ATTRIBUTE_HEAT, ATTRIBUTE_LIFE, ATTRIBUTE_CALMNESS}},
+    {"ember moss", 2, {ATTRIBUTE_COLD, ATTRIBUTE_COLD}},
+    {"wolf's horn", 4, {ATTRIBUTE_FORCE, ATTRIBUTE_FORCE, ATTRIBUTE_LIFE, ATTRIBUTE_PAIN}}
+};
+
+static const size_t INGRIDIENTS_COUNT = sizeof(INGRIDIENTS)/sizeof(INGRIDIENTS[0]);
+
+#endif // INGRIDIENTS_H
