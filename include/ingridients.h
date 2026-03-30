@@ -15,22 +15,58 @@ enum Attribute
     ATTRIBUTES_COUNT
 };
 
+struct Ingridient_attribute
+{
+    Attribute attribute;
+    size_t ticks_amount;
+};
+
 struct Ingridient
 {
     char name[100];
 
+    size_t price;
     size_t attributes_count;
-    Attribute attributes[10];
+    Ingridient_attribute attributes[10];
 };
 
 static const Ingridient INGRIDIENTS[]
 {
-    {"water", 5, {ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER, ATTRIBUTE_WATER}},
-    {"glowcap mushroom", 4, {ATTRIBUTE_PAIN, ATTRIBUTE_PAIN, ATTRIBUTE_COLD, ATTRIBUTE_CALMNESS}},
-    {"whichmint", 4, {ATTRIBUTE_CALMNESS, ATTRIBUTE_CALMNESS, ATTRIBUTE_COLD}},
-    {"sunspice", 5, {ATTRIBUTE_HEAT, ATTRIBUTE_HEAT, ATTRIBUTE_HEAT, ATTRIBUTE_LIFE, ATTRIBUTE_CALMNESS}},
-    {"ember moss", 2, {ATTRIBUTE_COLD, ATTRIBUTE_COLD}},
-    {"wolf's horn", 4, {ATTRIBUTE_FORCE, ATTRIBUTE_FORCE, ATTRIBUTE_LIFE, ATTRIBUTE_PAIN}}
+    {"water",               1, 5,   {
+                                    {ATTRIBUTE_WATER, 0}, 
+                                    {ATTRIBUTE_WATER, 0},
+                                    {ATTRIBUTE_WATER, 0},
+                                    {ATTRIBUTE_WATER, 0},
+                                    {ATTRIBUTE_WATER, 0}
+                                    }},
+    {"glowcap mushroom",    4, 4,   {
+                                    {ATTRIBUTE_PAIN, 10}, 
+                                    {ATTRIBUTE_PAIN, 30},
+                                    {ATTRIBUTE_COLD, 5},
+                                    {ATTRIBUTE_CALMNESS, 60}
+                                    }},
+    {"whichmint",           3, 3,   {
+                                    {ATTRIBUTE_CALMNESS, 5},
+                                    {ATTRIBUTE_CALMNESS, 10},
+                                    {ATTRIBUTE_COLD, 2}
+                                    }},
+    {"sunspice",            7, 5,   {
+                                    {ATTRIBUTE_HEAT, 10},
+                                    {ATTRIBUTE_HEAT, 10},
+                                    {ATTRIBUTE_HEAT, 10},
+                                    {ATTRIBUTE_LIFE, 50},
+                                    {ATTRIBUTE_CALMNESS, 40}
+                                    }},
+    {"ember moss",          2, 2,   {
+                                    {ATTRIBUTE_COLD, 50},
+                                    {ATTRIBUTE_COLD, 50}
+                                    }},
+    {"wolf's horn",         10, 4,  {
+                                    {ATTRIBUTE_FORCE, 5},
+                                    {ATTRIBUTE_FORCE, 5},
+                                    {ATTRIBUTE_LIFE, 10},
+                                    {ATTRIBUTE_PAIN, 15}
+                                    }}
 };
 
 static const size_t INGRIDIENTS_COUNT = sizeof(INGRIDIENTS)/sizeof(INGRIDIENTS[0]);

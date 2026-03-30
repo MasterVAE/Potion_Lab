@@ -8,8 +8,12 @@ bool Loop();
 
 bool Exit();
 bool Add();
+bool Boil();
+bool Wait();
+bool Stir();
 bool Start();
 bool Change();
+bool Filter();
 bool Finish();
 bool Help();
 bool H();
@@ -24,9 +28,13 @@ static Command COMMANDS[] =
 {
     {"exit",    Exit},
     {"add",     Add},
+    {"boil",    Boil},
+    {"wait",    Wait},
+    {"stir",    Stir},
     {"start",   Start},
     {"change",  Change},
     {"finish",  Finish},
+    {"filter",  Filter},
     {"help",    Help},
     {"h",       H}
 };

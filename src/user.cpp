@@ -4,14 +4,12 @@
 
 #include "potion.h"
 #include "user.h"
+#include "game.h"
+#include "colors.h"
 
 #include "lib.h"
 
-size_t CURRENT_POTION = 0;
-static const size_t MAX_POTION = 5;
-
-Potion* potion[] = {NULL};
-
+Game* game;
 
 bool Init()
 {
@@ -21,6 +19,9 @@ bool Init()
         "Enter help to get list of commands\n"
         "______________________\n"
     );
+
+    game = GameCreate();
+    if(!game) return false;
     
     return true;
 }
@@ -34,10 +35,12 @@ bool Loop()
     {
         if(!strcmp(buffer, COMMANDS[i].command))
         {
+            GameTick(game);
             return COMMANDS[i].func();
         }
     }
 
+    printf("Command not exist\n");
     return true;
 }
 
@@ -49,8 +52,7 @@ bool Exit()
 
 bool Add()
 {
-
-    if(!potion[CURRENT_POTION])
+    if(!game->potion[game->current_potion])
     {
         printf("No potion on this maker\n");
         return true;
@@ -65,9 +67,10 @@ bool Add()
         {
             for(size_t j = 0; j < INGRIDIENTS[i].attributes_count; j++)
             {
-                PotionAddAttribute(potion[CURRENT_POTION], INGRIDIENTS[i].attributes[j], 1); 
+                PotionAddIngridientAttribute(game->potion[game->current_potion], INGRIDIENTS[i].attributes[j]); 
             }
-            printf("Ingridient added\n");
+            game->money -= (long)INGRIDIENTS[i].price;
+            printf("Ingridient added. Money amount: %ld\n", game->money);
             return true;
         }
     }
@@ -77,20 +80,59 @@ bool Add()
     return true;
 }
 
+bool Boil()
+{
+    if(!game->potion[game->current_potion])
+    {
+        printf("No potion on this maker\n");
+        return true;
+    }
+
+    if(game->potion[game->current_potion]->attributes[ATTRIBUTE_WATER] > 0)
+        game->potion[game->current_potion]->attributes[ATTRIBUTE_WATER]--;
+
+    printf("Potion boiled\n");
+
+    return true;
+}
+
+bool Wait()
+{
+    return true;
+}
+
+bool Stir()
+{
+    if(!game->potion[game->current_potion])
+    {
+        printf("No potion on pot!\n");
+        return true;
+    }
+
+    for(size_t i = 0; i < 10; i++)
+    {
+        PotionTick(game->potion[game->current_potion]);
+    }
+
+    printf("Stired\n");
+    return true;
+}
+
 bool Start()
 {
-    if(potion[CURRENT_POTION])
+    if(game->potion[game->current_potion])
     {
         printf("Current potion not finished!\n");
         return true;
     }
     else
     {
-        potion[CURRENT_POTION] = PotionCreate();
+        game->potion[game->current_potion] = PotionCreate();
         printf("New potion created\n");
-        return (potion[CURRENT_POTION]);
+        return (game->potion[game->current_potion]);
     }
 }
+
 bool Change()
 {
     size_t new_maker = 0;
@@ -98,9 +140,9 @@ bool Change()
 
     if(new_maker < MAX_POTION)
     {
-        CURRENT_POTION = new_maker;
+        game->current_potion = new_maker;
 
-        printf("Maker changed\n");
+        printf("Pot changed\n");
         return true;
     }
 
@@ -108,11 +150,30 @@ bool Change()
     return true;
 }
 
+bool Filter()
+{
+    if(!game->potion[game->current_potion])
+    {
+        printf("No potion on this pot\n");
+        return true;
+    }
+
+
+    game->potion[game->current_potion]->ingridient_attributes_count = 0;
+    free(game->potion[game->current_potion]->ingridient_attributes);
+    game->potion[game->current_potion]->ingridient_attributes = 
+                                    (Ingridient_attribute*)calloc(1, sizeof(Ingridient_attribute));
+
+    printf("Potion filtered\n");
+
+    return true;
+}
+
 bool Finish()
 {
-    if(!potion[CURRENT_POTION])
+    if(!game->potion[game->current_potion])
     {
-        printf("No potion on this potion maker\n");
+        printf("No potion on this pot\n");
         return true;
     }
 
@@ -122,11 +183,11 @@ bool Finish()
         "Condition:\n"
     );
 
-    int healing = CalculateHealing(potion[CURRENT_POTION]);
-    int heating = CalculateHeating(potion[CURRENT_POTION]);
-    double concentration = CalculateConcentration(potion[CURRENT_POTION]);
-    double purity = CalculatePurity(potion[CURRENT_POTION]);
-    int stablility = CalculateStability(potion[CURRENT_POTION]);
+    int healing = CalculateHealing(game->potion[game->current_potion]);
+    int heating = CalculateHeating(game->potion[game->current_potion]);
+    double concentration = CalculateConcentration(game->potion[game->current_potion]);
+    double purity = CalculatePurity(game->potion[game->current_potion]);
+    int stablility = CalculateStability(game->potion[game->current_potion]);
 
     if(healing > 0)
     {
@@ -150,13 +211,12 @@ bool Finish()
     printf("Purity: %g\n", purity);
     printf("Stability: %d\n", stablility);
 
-
-
     printf(
         "________________\n"
     );
 
-    potion[CURRENT_POTION] = NULL;
+    PotionDestroy(game->potion[game->current_potion]);
+    game->potion[game->current_potion] = NULL;
 
     return true;
 }
@@ -185,12 +245,12 @@ bool H()
         printf(
             "____________\n"
             "Ingridients:\n"
-            "Water\n"
-            "Glowcap mushroom\n"
-            "Whichmint\n"
-            "Sunspice\n"
-            "Ember moss\n"
-            "Wolf's horn\n"
+            "Water              1$\n"
+            "Glowcap mushroom   4$\n"
+            "Whichmint          3$\n"
+            "Sunspice           7$\n"
+            "Ember moss         2$\n"
+            "Wolf's horn        10$\n"
             "____________\n"
         );
     }
@@ -199,9 +259,13 @@ bool H()
         printf(
             "____________\n"
             "Actions:\n"
-            "change *number*    -- change potion maker\n"
+            "change *0-4*       -- change potion maker\n"
             "start              -- start new potion\n"
             "add *ingridient*   -- add ingridiend to potion\n"
+            "boil               -- boil potion\n"  
+            "wait               -- wait for one tick\n"
+            "stir               -- stir potion\n" 
+            "filter             -- filter potion\n"
             "finish             -- finish potion and start new\n"
             "____________\n"
         );
@@ -212,3 +276,4 @@ bool H()
     }
     return true;    
 }
+

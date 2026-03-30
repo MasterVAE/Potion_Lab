@@ -1,4 +1,4 @@
-SOURCES_MAIN = main.cpp potion.cpp user.cpp lib.cpp
+SOURCES_MAIN = main.cpp potion.cpp user.cpp lib.cpp game.cpp
 				
 TARGET_MAIN = $(TARGET_DIR)/prog.out
 
