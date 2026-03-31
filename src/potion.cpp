@@ -22,6 +22,8 @@ Potion* PotionCreate()
     }
 
     PotionAddAttribute(potion, ATTRIBUTE_WATER, 10);
+
+    potion->finished = false;
     return potion;
 }
 

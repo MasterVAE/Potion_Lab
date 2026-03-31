@@ -11,6 +11,8 @@ struct Potion
     size_t ingridient_attributes_count;
     Ingridient_attribute* ingridient_attributes;
     size_t attributes[ATTRIBUTES_COUNT];
+
+    bool finished;
 };
 
 Potion* PotionCreate();

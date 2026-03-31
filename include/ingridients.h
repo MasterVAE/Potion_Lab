@@ -24,6 +24,7 @@ struct Ingridient_attribute
 struct Ingridient
 {
     char name[100];
+    char name_short[100];
 
     size_t price;
     size_t attributes_count;
@@ -32,36 +33,36 @@ struct Ingridient
 
 static const Ingridient INGRIDIENTS[]
 {
-    {"water",               1, 5,   {
+    {"water", "wt",             1, 5,   {
                                     {ATTRIBUTE_WATER, 0}, 
                                     {ATTRIBUTE_WATER, 0},
                                     {ATTRIBUTE_WATER, 0},
                                     {ATTRIBUTE_WATER, 0},
                                     {ATTRIBUTE_WATER, 0}
                                     }},
-    {"glowcap mushroom",    4, 4,   {
+    {"glowcap mushroom", "gm",  4, 4,   {
                                     {ATTRIBUTE_PAIN, 10}, 
                                     {ATTRIBUTE_PAIN, 30},
                                     {ATTRIBUTE_COLD, 5},
                                     {ATTRIBUTE_CALMNESS, 60}
                                     }},
-    {"whichmint",           3, 3,   {
+    {"whichmint", "wm",         3, 3,   {
                                     {ATTRIBUTE_CALMNESS, 5},
                                     {ATTRIBUTE_CALMNESS, 10},
                                     {ATTRIBUTE_COLD, 2}
                                     }},
-    {"sunspice",            7, 5,   {
+    {"sunspice", "ss",          7, 5,   {
                                     {ATTRIBUTE_HEAT, 10},
                                     {ATTRIBUTE_HEAT, 10},
                                     {ATTRIBUTE_HEAT, 10},
                                     {ATTRIBUTE_LIFE, 50},
                                     {ATTRIBUTE_CALMNESS, 40}
                                     }},
-    {"ember moss",          2, 2,   {
+    {"ember moss", "em",        2, 2,   {
                                     {ATTRIBUTE_COLD, 50},
                                     {ATTRIBUTE_COLD, 50}
                                     }},
-    {"wolf's horn",         10, 4,  {
+    {"wolf's horn", "wh",       10, 4,  {
                                     {ATTRIBUTE_FORCE, 5},
                                     {ATTRIBUTE_FORCE, 5},
                                     {ATTRIBUTE_LIFE, 10},

@@ -15,8 +15,8 @@ bool Init()
 {
     printf(
         "______________________\n"
-        "Welcome to Potion Lab!\n"
-        "Enter help to get list of commands\n"
+        BOLD GREEN "Welcome to Potion Lab!\n"
+        "Enter help to get list of commands\n" CLEAR
         "______________________\n"
     );
 
@@ -33,14 +33,14 @@ bool Loop()
 
     for(size_t i = 0 ; i < COMMANDS_COUNT; i++)
     {
-        if(!strcmp(buffer, COMMANDS[i].command))
+        if(!strcmp(buffer, COMMANDS[i].command) || !strcmp(buffer, COMMANDS[i].command_short))
         {
             GameTick(game);
             return COMMANDS[i].func();
         }
     }
 
-    printf("Command not exist\n");
+    printf(RED "Command not exist\n" CLEAR);
     return true;
 }
 
@@ -54,7 +54,13 @@ bool Add()
 {
     if(!game->potion[game->current_potion])
     {
-        printf("No potion on this maker\n");
+        printf(RED "No potion on this maker\n" CLEAR);
+        return true;
+    }
+
+    if(game->potion[game->current_potion]->finished)
+    {
+        printf(RED "Potion finished\n" CLEAR);
         return true;
     }
 
@@ -63,19 +69,20 @@ bool Add()
 
     for(size_t i = 0; i < INGRIDIENTS_COUNT; i++)
     {
-        if(!lstrncmp(buffer + 1, INGRIDIENTS[i].name, strlen(INGRIDIENTS[i].name)))
+        if(!lstrncmp(buffer + 1, INGRIDIENTS[i].name, strlen(INGRIDIENTS[i].name)) ||
+           !lstrncmp(buffer + 1, INGRIDIENTS[i].name_short, strlen(INGRIDIENTS[i].name_short)))
         {
             for(size_t j = 0; j < INGRIDIENTS[i].attributes_count; j++)
             {
                 PotionAddIngridientAttribute(game->potion[game->current_potion], INGRIDIENTS[i].attributes[j]); 
             }
             game->money -= (long)INGRIDIENTS[i].price;
-            printf("Ingridient added. Money amount: %ld\n", game->money);
+            printf("Ingridient added. Money amount: " YELLOW "%ld$\n" CLEAR, game->money);
             return true;
         }
     }
 
-    printf("Ingridient not found\n");
+    printf(RED "Ingridient not found\n" CLEAR);
 
     return true;
 }
@@ -84,7 +91,13 @@ bool Boil()
 {
     if(!game->potion[game->current_potion])
     {
-        printf("No potion on this maker\n");
+        printf(RED "No potion on this maker\n" CLEAR);
+        return true;
+    }
+
+    if(game->potion[game->current_potion]->finished)
+    {
+        printf(RED "Potion finished\n" CLEAR);
         return true;
     }
 
@@ -105,7 +118,13 @@ bool Stir()
 {
     if(!game->potion[game->current_potion])
     {
-        printf("No potion on pot!\n");
+        printf(RED "No potion on pot!\n" CLEAR);
+        return true;
+    }
+
+    if(game->potion[game->current_potion]->finished)
+    {
+        printf(RED "Potion finished\n" CLEAR);
         return true;
     }
 
@@ -121,16 +140,13 @@ bool Stir()
 bool Start()
 {
     if(game->potion[game->current_potion])
-    {
-        printf("Current potion not finished!\n");
-        return true;
+    { 
+        PotionDestroy(game->potion[game->current_potion]);
     }
-    else
-    {
-        game->potion[game->current_potion] = PotionCreate();
-        printf("New potion created\n");
-        return (game->potion[game->current_potion]);
-    }
+
+    game->potion[game->current_potion] = PotionCreate();
+    printf("New potion created\n");
+    return (game->potion[game->current_potion]);
 }
 
 bool Change()
@@ -146,7 +162,7 @@ bool Change()
         return true;
     }
 
-    printf("Incorrect number\n");
+    printf(RED "Incorrect number\n" CLEAR);
     return true;
 }
 
@@ -154,7 +170,13 @@ bool Filter()
 {
     if(!game->potion[game->current_potion])
     {
-        printf("No potion on this pot\n");
+        printf(RED "No potion on this pot\n" CLEAR);
+        return true;
+    }
+
+    if(game->potion[game->current_potion]->finished)
+    {
+        printf(RED "Potion finished\n" CLEAR);
         return true;
     }
 
@@ -173,14 +195,16 @@ bool Finish()
 {
     if(!game->potion[game->current_potion])
     {
-        printf("No potion on this pot\n");
+        printf(RED "No potion on this pot\n" CLEAR);
         return true;
     }
 
+    game->potion[game->current_potion]->finished = true;
+
     printf(
         "________________\n"
-        "Potion finished!\n"
-        "Condition:\n"
+        BOLD GREEN "Potion finished!\n"
+        "Condition:\n" CLEAR
     );
 
     int healing = CalculateHealing(game->potion[game->current_potion]);
@@ -215,8 +239,7 @@ bool Finish()
         "________________\n"
     );
 
-    PotionDestroy(game->potion[game->current_potion]);
-    game->potion[game->current_potion] = NULL;
+    
 
     return true;
 }
@@ -225,10 +248,11 @@ bool Help()
 {
     printf( 
         "______________________\n"
-        "Commands:\n"
+        BOLD GREEN "Commands:\n" CLEAR
         "help               -- get list of instructions\n"
-        "h ingridients      -- get list of ingridients\n"
-        "h actions          -- get list of all actions\n"
+        "h ingridients/i    -- get list of ingridients\n"
+        "h actions/a        -- get list of all actions\n"
+        "orders/o           -- get list of current orders\n"
         "exit               -- leave programm\n"
         "______________________\n"
         );
@@ -240,33 +264,34 @@ bool H()
     char buffer[100] = {0};
     scanf("%99[^\n]", buffer);
 
-    if(!strcmp(buffer + 1, "ingridients"))
+    if(!strcmp(buffer + 1, "ingridients") || !strcmp(buffer + 1, "i"))
     {
         printf(
             "____________\n"
-            "Ingridients:\n"
-            "Water              1$\n"
-            "Glowcap mushroom   4$\n"
-            "Whichmint          3$\n"
-            "Sunspice           7$\n"
-            "Ember moss         2$\n"
-            "Wolf's horn        10$\n"
+            BOLD GREEN "Ingridients:\n" CLEAR
+            "Water/wt            " YELLOW "1$\n" CLEAR
+            "Glowcap mushroom/gm " YELLOW "4$\n" CLEAR
+            "Whichmint/wm        " YELLOW "3$\n" CLEAR
+            "Sunspice/ss         " YELLOW "7$\n" CLEAR
+            "Ember moss/em       " YELLOW "2$\n" CLEAR
+            "Wolf's horn/wh      " YELLOW "10$\n" CLEAR
             "____________\n"
         );
     }
-    else if(!strcmp(buffer + 1, "actions"))
+    else if(!strcmp(buffer + 1, "actions") || !strcmp(buffer + 1, "a"))
     {
         printf(
             "____________\n"
-            "Actions:\n"
-            "change *0-4*       -- change potion maker\n"
-            "start              -- start new potion\n"
-            "add *ingridient*   -- add ingridiend to potion\n"
-            "boil               -- boil potion\n"  
-            "wait               -- wait for one tick\n"
-            "stir               -- stir potion\n" 
-            "filter             -- filter potion\n"
-            "finish             -- finish potion and start new\n"
+            BOLD GREEN "Actions:\n" CLEAR
+            "change/-> *0-4*    -- change potion maker\n"
+            "start/st           -- start new potion\n"
+            "add/+ *ingridient* -- add ingridiend to potion\n"
+            "boil/b             -- boil potion\n"  
+            "wait/w             -- wait for one tick\n"
+            "stir/s             -- stir potion\n" 
+            "filter/f           -- filter potion\n"
+            "finish/=           -- finish potion and start new\n"
+            "close/c *0-2*      -- close order\n"       
             "____________\n"
         );
     }
@@ -275,5 +300,114 @@ bool H()
         printf("Table not found\n");
     }
     return true;    
+}
+
+bool Orders()
+{
+    printf(
+        "____________________\n"
+        BOLD GREEN "Orders:\n" CLEAR
+        );
+    for(size_t i = 0; i < MAX_ORDERS; i++)
+    {
+        printf(GREEN "Order %lu\n" CLEAR, i);
+        Order* order = game->orders[i];
+
+        if(order->healing > 0)  printf("Healing at least %d\n", order->healing);
+        else if(order->healing < 0) printf("Toxicity at least %d\n", -order->healing);
+
+        if(order->heating > 0)  printf("Hotness at least %d\n", order->heating);
+        else if(order->heating < 0) printf("Coldness at least %d\n", -order->heating);
+
+        printf("Purity at least %g\n", order->purity);
+
+        if(order->concentration_more) printf("Concentration at least %g\n", order->concentration);
+        else printf("Concentration no more %g\n", order->concentration);
+
+        printf("Stability at least %d\n", order->stability);
+    }
+    printf("____________________\n");
+    return true;
+}
+
+bool Close()
+{
+    size_t order_num = 0;
+    scanf("%lu", &order_num);
+
+    if(order_num > MAX_ORDERS)
+    {
+        printf(RED "No such order\n" CLEAR);
+        return true;
+    }  
+    
+    Order* order = game->orders[order_num];
+    Potion* potion = game->potion[game->current_potion];
+
+    int healing = CalculateHealing(potion);
+    int heating = CalculateHeating(potion);
+    double concentration = CalculateConcentration(potion);
+    double purity = CalculatePurity(potion);
+    int stablility = CalculateStability(potion);
+
+    if(order->healing > 0 && order->healing > healing)
+    {
+        printf("Not enough healing\n");
+        return true;
+    }
+
+    if(order->healing < 0 && order->healing < healing)
+    {
+        printf("Not enough toxicity\n");
+        return true;
+    }
+
+    if(order->heating > 0 && order->heating > heating)
+    {
+        printf("Not enough hotness\n");
+        return true;
+    }
+
+    if(order->heating < 0 && order->heating < heating)
+    {
+        printf("Not enough coldness\n");
+        return true;
+    }
+
+    if(order->purity > purity)
+    {
+        printf("Not enough purity\n");
+        return true;
+    }
+
+    if(order->concentration_more)
+    {
+        if(order->concentration > concentration)
+        {
+            printf("Not enough concentration\n");
+            return true;
+        }
+    }
+    else
+    {
+        if(order->concentration < concentration)
+        {
+            printf("Too much concentration\n");
+            return true;
+        }
+    }
+
+    if(order->stability > stablility)
+    {
+        printf("Not enough stability\n");
+        return true;
+    }
+
+    printf(GREEN "Order closed!\n" CLEAR);
+    game->money += 100;
+
+    OrderDestroy(order);
+    game->orders[order_num] = OrderCreate();
+    return true;
 }
 
